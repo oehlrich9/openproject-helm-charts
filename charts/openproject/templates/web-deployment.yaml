@@ -7,6 +7,7 @@ metadata:
     {{- include "common.labels.standard" . | nindent 4 }}
     openproject/process: web
 spec:
+  progressDeadlineSeconds: {{ default 600 .Values.progressDeadlineSeconds }}
   replicas: {{ .Values.replicaCount }}
   strategy:
     {{ .Values.strategy | toYaml | nindent 4 }}
@@ -53,6 +54,9 @@ spec:
             claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ include "common.names.fullname" . }}{{- end }}
         {{- end }}
         {{- include "openproject.extraVolumes" . | indent 8 }}
+        {{- if .Values.extraVolumes }}
+        {{- toYaml .Values.extraVolumes | nindent 8 }}
+        {{- end }}
       initContainers:
         - name: wait-for-db
           {{- include "openproject.containerSecurityContext" . | indent 10 }}
@@ -92,6 +96,9 @@ spec:
               readOnly: false
             {{- end }}
             {{- include "openproject.extraVolumeMounts" . | indent 12 }}
+            {{- if .Values.extraVolumeMounts }}
+            {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
+            {{- end }}
           ports:
             {{- range $key, $value := .Values.service.ports }}
             - name: {{ $key }}

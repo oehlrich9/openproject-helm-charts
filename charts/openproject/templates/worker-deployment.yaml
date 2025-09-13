@@ -9,6 +9,7 @@ metadata:
     {{- include "common.labels.standard" . | nindent 4 }}
     openproject/process: worker-{{ $workerName }}
 spec:
+  progressDeadlineSeconds: {{ default 600 .Values.progressDeadlineSeconds }}
   replicas: {{( kindIs "invalid" $workerValues.replicaCount) | ternary .Values.backgroundReplicaCount $workerValues.replicaCount }}
   strategy:
     {{ coalesce $workerValues.strategy .Values.strategy | toYaml | nindent 4 }}
